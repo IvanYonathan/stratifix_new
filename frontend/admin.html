@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SECRET STRATIFIX - POGGI ONLY</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container admin-container">
+        <header>
+            <h1>POGGI'S TICKET MANAGEMENT</h1>
+        </header>
+
+        <main>
+            <section class="login-section" id="login-section">
+                <h2>Login here, Poggi</h2>
+                
+                <form id="login-form">
+                    <div class="form-group">
+                        <label for="username">Bat is your name, pogger:</label>
+                        <input type="text" id="username" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="password">Tell me your secret:</label>
+                        <input type="password" id="password" required>
+                    </div>
+                    
+                    <button type="submit">FREE FOODS</button>
+                </form>
+            </section>
+
+            <section class="admin-dashboard" id="admin-dashboard" style="display: none;">
+                <h2>MANAGE POGGI'S FOODS</h2>
+                
+                <div class="dashboard-header">
+                    <h3>Pending Bookings</h3>
+                    <button id="refresh-bookings">Refresh</button>
+                </div>
+                
+                <div class="bookings-list">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Customer</th>
+                                <th>Contact</th>
+                                <th>Seats</th>
+                                <th>Payment</th>
+                                <th>Amount</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bookings-table-body">
+                            <!-- Will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="no-bookings" id="no-bookings" style="display: none;">
+                    <p>No pending bookings found.</p>
+                </div>
+                
+                <button id="logout">Logout</button>
+            </section>
+        </main>
+
+        <footer>
+            <p>© 2025 STRATIFIX Theater | Admin Panel</p>
+        </footer>
+    </div>
+
+    <script src="admin.js"></script>
+</body>
+</html>
