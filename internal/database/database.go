@@ -110,7 +110,7 @@ func createTables(db *sql.DB) error {
 func initAdminUser(db *sql.DB) error {
 	// Check if admin user exists
 	var count int
-	err := db.QueryRow("SELECT COUNT(*) FROM users WHERE username = 'admin'").Scan(&count)
+	err := db.QueryRow("SELECT COUNT(*) FROM users WHERE username = 'Poggi'").Scan(&count)
 	if err != nil {
 		return err
 	}
@@ -118,7 +118,7 @@ func initAdminUser(db *sql.DB) error {
 	// If admin doesn't exist, create one
 	if count == 0 {
 		// In a real app, you'd hash the password properly
-		_, err = db.Exec("INSERT INTO users (username, password_hash, is_admin) VALUES ('admin', 'admin123', TRUE)")
+		_, err = db.Exec("INSERT INTO users (username, password_hash, is_admin) VALUES ('Poggi', 'poggidabigpog', TRUE)")
 		if err != nil {
 			return err
 		}
@@ -365,4 +365,62 @@ func (db *Database) UpdateBookingStatus(bookingID int, status string) error {
 	}
 	
 	return tx.Commit()
+}
+
+func (db *Database) ReleaseExpiredBookings() error {
+    // Start a transaction
+    tx, err := db.Begin()
+    if err != nil {
+        return err
+    }
+    defer tx.Rollback()
+    
+    // Find expired bookings (older than 24 hours and still pending)
+    rows, err := tx.Query(`
+        SELECT id FROM bookings 
+        WHERE status = 'pending' AND created_at < NOW() - INTERVAL '24 hours'
+    `)
+    if err != nil {
+        return err
+    }
+    defer rows.Close()
+    
+    // Collect expired booking IDs
+    var expiredIDs []int
+    for rows.Next() {
+        var id int
+        if err := rows.Scan(&id); err != nil {
+            return err
+        }
+        expiredIDs = append(expiredIDs, id)
+    }
+    
+    // If no expired bookings, we're done
+    if len(expiredIDs) == 0 {
+        return nil
+    }
+    
+    // For each expired booking, update status and release seats
+    for _, id := range expiredIDs {
+        // Update booking status to 'expired'
+        _, err = tx.Exec("UPDATE bookings SET status = 'expired' WHERE id = $1", id)
+        if err != nil {
+            return err
+        }
+        
+        // Release the seats (set status back to 'available')
+        _, err = tx.Exec(`
+            UPDATE seats 
+            SET status = 'available' 
+            WHERE id IN (
+                SELECT seat_id FROM booking_seats WHERE booking_id = $1
+            )
+        `, id)
+        if err != nil {
+            return err
+        }
+    }
+    
+    // Commit the transaction
+    return tx.Commit()
 }

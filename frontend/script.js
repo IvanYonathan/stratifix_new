@@ -25,6 +25,28 @@ document.addEventListener('DOMContentLoaded', function() {
     const paymentMethodRadios = document.getElementsByName('payment-method');
     const bankTransferInfo = document.querySelector('.bank-transfer-info');
     const cashInfo = document.querySelector('.cash-info');
+    const whatsappButton = document.getElementById('whatsapp-contact');
+
+    // Generate WhatsApp URL with pre-populated message
+    function generateWhatsAppURL(bookingRef, paymentMethod) {
+        // Kezia's phone number from the document
+        const phoneNumber = "6282121078944"; // Format for WhatsApp: country code (62) + number without leading zero
+        
+        let message = "";
+        
+        // Create different messages based on payment method
+        if (paymentMethod === 'bank_transfer') {
+            message = `Hi, saya telah transfer ke rekening bank dengan Booking ID ${bookingRef} .`;
+        } else {
+            message = `Hi, booking ID saya adalah ${bookingRef} dan saya mau bayar cash. Bisakah kita ketemu sepulang sekolah / istirahat 1 / istirahat 2 ?`;
+        }
+        
+        // Encode the message for a URL
+        const encodedMessage = encodeURIComponent(message);
+        
+        // Create the WhatsApp URL
+        return `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
+    }
 
     // Fetch all seats from the server
     function fetchSeats() {
@@ -43,7 +65,6 @@ document.addEventListener('DOMContentLoaded', function() {
             });
     }
 
-    // Render seats in the theater layout
     // Render seats in the theater layout
     function renderSeats() {
         seatingMap.innerHTML = '';
@@ -124,34 +145,34 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     // Helper function to create a seat element
-function createSeatElement(seat) {
-    const seatDiv = document.createElement('div');
-    
-    // Create the appropriate class based on both type and status
-    let classNames = `seat ${seat.type}`;
-    
-    // Add status class
-    if (seat.status === 'sponsored') {
-        classNames += ' sponsored'; // Add sponsored class for sponsored status
-    } else {
-        classNames += ` ${seat.status}`; // Add regular status class
+    function createSeatElement(seat) {
+        const seatDiv = document.createElement('div');
+        
+        // Create the appropriate class based on both type and status
+        let classNames = `seat ${seat.type}`;
+        
+        // Add status class
+        if (seat.status === 'sponsored') {
+            classNames += ' sponsored'; // Add sponsored class for sponsored status
+        } else {
+            classNames += ` ${seat.status}`; // Add regular status class
+        }
+        
+        seatDiv.className = classNames;
+        seatDiv.dataset.id = seat.id;
+        seatDiv.dataset.row = seat.row;
+        seatDiv.dataset.number = seat.number;
+        seatDiv.dataset.type = seat.type;
+        seatDiv.dataset.status = seat.status;
+        seatDiv.textContent = seat.number;
+        
+        // Add click handler for available seats
+        if (seat.status === 'available') {
+            seatDiv.addEventListener('click', () => toggleSeatSelection(seat));
+        }
+        
+        return seatDiv;
     }
-    
-    seatDiv.className = classNames;
-    seatDiv.dataset.id = seat.id;
-    seatDiv.dataset.row = seat.row;
-    seatDiv.dataset.number = seat.number;
-    seatDiv.dataset.type = seat.type;
-    seatDiv.dataset.status = seat.status;
-    seatDiv.textContent = seat.number;
-    
-    // Add click handler for available seats
-    if (seat.status === 'available') {
-        seatDiv.addEventListener('click', () => toggleSeatSelection(seat));
-    }
-    
-    return seatDiv;
-}
 
     // Toggle seat selection
     function toggleSeatSelection(seat) {
@@ -331,9 +352,14 @@ function createSeatElement(seat) {
                 <p>Visit our booth after school hours to complete your payment.</p>
                 <p>Contact: Kezia Orlie (+62 821-2107-8944)</p>
                 <p>Contact: Stefanie Christensia Siwu (+62 895-4176-40808)</p>
-                <p>Please mention your booking reference (${bookingRef}) when making the payment.</p>
+                <b>Please mention your booking reference (${bookingRef}) when making the payment.</b>
             `;
         }
+        
+        // Set up the WhatsApp button with the appropriate link
+        whatsappButton.addEventListener('click', function() {
+            window.open(generateWhatsAppURL(bookingRef, paymentMethod), '_blank');
+        });
         
         // Hide booking form and show confirmation
         bookingForm.style.display = 'none';

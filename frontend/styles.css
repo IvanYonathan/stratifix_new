@@ -617,3 +617,20 @@ footer {
     margin-bottom: 30px;
     position: relative;
 }
+
+/* WhatsApp button styling */
+.whatsapp-btn {
+    background-color: #25D366;
+    margin: 20px 0;
+    display: block;
+    width: 100%;
+}
+
+.whatsapp-btn:hover {
+    background-color: #128C7E;
+}
+
+/* Add some separation between buttons */
+#new-booking {
+    margin-top: 15px;
+}

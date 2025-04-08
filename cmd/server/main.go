@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"stratifix/internal/database"
 	"stratifix/internal/handlers"
@@ -22,7 +23,7 @@ func main() {
 	h := handlers.NewHandler(db)
 
 	// Special route for admin page
-	http.HandleFunc("/admin", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/poggi", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "./frontend/admin.html")
 	})
 
@@ -36,6 +37,17 @@ func main() {
 	http.HandleFunc("/api/admin/login", h.AdminLogin)
 	http.HandleFunc("/api/admin/bookings", h.GetBookings)
 	http.HandleFunc("/api/admin/verify", h.VerifyPayment)
+
+	go func() {
+        ticker := time.NewTicker(1 * time.Hour) // Check every hour
+        defer ticker.Stop()
+        
+        for range ticker.C {
+			if err := db.ReleaseExpiredBookings(); err != nil {
+				log.Printf("Error releasing expired bookings: %v", err)
+			}
+		}
+    }()
 
 	// Get port from environment variable (for Railway)
 	port := os.Getenv("PORT")
