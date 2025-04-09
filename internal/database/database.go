@@ -162,8 +162,8 @@ func initSeats(db *sql.DB) error {
 				seatType := "regular"
 				status := "available"
 				
-				// VIP seats: (E,F,G,H,I,J,K)13-15 & (E,F,G,H,I,J,K)16-18
-				if (row >= "E" && row <= "K") && ((i >= 13 && i <= 15) || (i >= 16 && i <= 18)) {
+				// VIP seats: (E,F,G,H,I,J,K)8-23
+				if (row >= "E" && row <= "K") && (i >= 8 && i <= 23) {
 					seatType = "vip"
 				}
 				
